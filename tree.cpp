@@ -1,10 +1,22 @@
-#include <iostream>
+/*
+Tree: 	
+						A
+				B				C
+			D				E		F		
+		 G	  H			  I	
 
+
+前序遍历：ABDGHCEIF
+前序输入：ABDG##H###CEI###F## 
+
+*/
+#include <iostream>
+#include <queue>
 using namespace std;
 
 
 #define MAX_TREE_SIZE 100
-typedef int TElemType;
+typedef char TElemType;
 
 // 双亲表示法 
 struct PTNode{
@@ -41,12 +53,12 @@ typedef struct BTNode{
 typedef struct BiTNode{
 	TElemType data;
 	struct BiTNode *lchild, *rchild;
-}BiTNode, *BiTNode; 
+}BiTNode, *BiTree; 
 
 
 //	树结构 
-typedef struct{
-	PTNode nodes[MAX_TREE_SIZE];
+typedef struct Tree{
+	struct PTNode nodes[MAX_TREE_SIZE];
 	int r, n;
 };
 
@@ -70,8 +82,81 @@ void InOrderTraverse(BiTree T){
 	InOrderTraverse(T->rchild);
 } 
 
+// 后序遍历： 简化为三角形，遍历顺序 左子树-->右子树-->顶点
+void PostOrderTraverse(BiTree T){
+	if (T == NULL)
+		return ;
+	PostOrderTraverse(T->lchild);
+	PostOrderTraverse(T->rchild);
+	printf("%c", T->data);
+} 
 
-int main(){
+// 层序遍历： 整个二叉树，从上到下、从左到右依次遍历。 
+// 思路：建立一个队列，某一结点 A 先入队，A出队时则将它的孩子入队，反复进行。 
+void LevelOrderTraverse(BiTree T){
+	if (T == NULL)
+		return;
+	queue<BiTree> q;
+	BiTree front; 
+	q.push(T); 
+	while (!q.empty()){
+		front = q.front();
+		q.pop();
+		if (front->lchild)
+			q.push(front->lchild);
+		if (front->rchild)
+			q.push(front->rchild);
+		printf("%c", front->data);
+	}
+	
+} 
+
+// 前序遍历创建树 
+void CreateBiTree_Pre(BiTree *T){
+	char c;
+	scanf("%c",&c);
+	
+	if (c == '#'){
+		*T = NULL;
+		return;
+	}
+	
+	*T = (BiTree)malloc(sizeof(BiTNode));
+	(*T)->data = c;
+	
+	CreateBiTree_Pre(&(*T)->lchild);
+	CreateBiTree_Pre(&(*T)->rchild);
+	return;	
+}
+
+// 释放二叉树的占用内存 
+void delNode(BiTree *T) 
+{
+  if (*T == NULL) 
+  	return;
+  delNode(&(*T)->lchild);
+  delNode(&(*T)->rchild);
+  free(*T);
+  *T = NULL; 
+  return;
+}
+
+int main(int argc, char *argv[])
+{
+	BiTree T = NULL;
+	printf("请前序遍历输入结点：");
+	CreateBiTree_Pre(&T);
+	printf("前序遍历：");
+	PreOrderTraverse(T);
+	printf("\n中序遍历：");
+	InOrderTraverse(T);
+	printf("\n后序遍历：");
+	PostOrderTraverse(T);
+	printf("\n层序遍历：");
+	LevelOrderTraverse(T);
+	delNode(&T);
+	
 	
 	return 0;
 }
+
