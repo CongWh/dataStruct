@@ -1,9 +1,6 @@
 #include <iostream>
-#include <queue>
-#include <stack>
 
 using namespace std;
-
 typedef int TElemType; 
 
 typedef struct BiTNode{
@@ -11,9 +8,18 @@ typedef struct BiTNode{
 	struct BiTNode *lchild, *rchild;
 }BiTNode, *BiTree; 
 
+
+/*
+二叉排序树原理： 一个空树遇到第一个树时，将它作为根 root。再次插入数值 key 后，与根结点进行比较，
+若 key > root ，则向根的右子树比较，反之向根的左子树比较。依次与路上的各个结点比较。最终的排序树
+的顺序为二叉树中序遍历。 
+*/
+
+
+// 查找 
 int BST(BiTree T, BiTree parent, int key, BiTree *p){
 	if (!T){
-		*p = parent;  // 主要用来作其他操作的使用条件 
+		*p = parent;  // 主要用来作其他操作的使用条件，*p 只是一个结点，非一个树结构 
 		return 0;
 	}
 	else if (key < T->data){
@@ -62,8 +68,8 @@ int InsertBST(BiTree *T,int key){
 
 		s = (BiTree)malloc(sizeof(BiTNode));
 		s->data = key;	// 创建结点 key
-		s->lchild = s->rchild = nullptr;
-		if (!p){
+		s->lchild = s->rchild = nullptr;	// 不是递归，需要手动初始化左右子树 
+		if (!p){	// 先判断是否为空 
 			*T = s;
 		} 		
 		else if (key > p->data){
@@ -82,7 +88,7 @@ int Delete(BiTree *p){	// 删除某结点 （需要嫁接其左右子树）
 	if (!(*p))
 		return 0;
 	BiTree s = *p;
-	if (!(*p)->lchild){
+	if (!(*p)->lchild){		// 删除结点简单情况：只有左子树或右子树 
 		(*p) = (*p)->rchild;
 		free(s);
 	}
@@ -90,7 +96,7 @@ int Delete(BiTree *p){	// 删除某结点 （需要嫁接其左右子树）
 		(*p) = (*p)->lchild;
 		free(s);
 	}	
-	else{		// 左右子树都存在，找其前驱 
+	else{		// 左右子树都存在，找其前驱（得到最相近的数，这样深度不会增加） 
 		s = (*p)->lchild;	// 中序遍历的特点 前驱为该结点，否则在其右子树中
 		BiTree tmp = *p;
 		if (!s->rchild){	// 判断斜树:若左斜则lchild为前驱 
@@ -141,8 +147,7 @@ int main(){
 	int a[10] = {62,88,58,47,35,73,51,99,37,93};
 	for( i = 0; i < n; i++ )
 		InsertBST(&T, a[i]);
-	int m = BST(T,NULL,key,&p);
-	cout << m << ' ' << p->data << endl;
+
 	printf("中序遍历二叉排序树：\n");
 	InOrderTraverse(T);
 	printf("\n");
